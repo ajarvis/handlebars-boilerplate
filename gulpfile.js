@@ -14,7 +14,6 @@ var gulp          = require('gulp'),
     del           = require('del'),
     vinylPaths    = require('vinyl-paths'),
     colors        = require('colors'),
-    util          = require('gulp-util'),
     concat        = require('gulp-concat'),
     sassGlob      = require('gulp-sass-bulk-import'),
     watch         = require('gulp-watch'),
@@ -41,6 +40,29 @@ var paths = {
   },
 }.init();
 
+// ERROR HANDLING
+// ---------------
+var displayError = function(error) {
+  var errorString = '[' + error.plugin.error.bold + ']';
+  errorString += ' ' + error.message.replace("\n",''); // Removes new line at the end
+  if(error.fileName) {
+    errorString += ' in ' + error.fileName;
+  }
+  if(error.lineNumber) {
+    errorString += ' on line ' + error.lineNumber.bold;
+  }
+  console.error(errorString);
+}
+var onError = function(err) {
+  notify.onError({
+    title:    "Gulp",
+    subtitle: "Failure!",
+    message:  "Error: <%= error.message %>",
+    sound:    "Basso"
+  })(err);
+  this.emit('end');
+};
+
 
 // BUILD ALL SUBTASKS
 // ---------------
@@ -53,19 +75,24 @@ gulp.task('serve', () => {
   });
 });
 
-gulp.task('styles', () => {
+/* Glob SCSS Imports, generate sourcemaps, and compile CSS */
+gulp.task('styles', function() {
   gulp.src([paths.src.sass])
     .pipe(sassGlob())
-    .pipe(cleanCSS())
-    .on('error', util.log)
+    .pipe(plumber({errorHandler: onError}))
+    .pipe(sourcemaps.init())
     .pipe(sass({
       includePaths: ['src/scss'],
+      outputStyle: 'expanded'
     }))
-    .on('error', util.log)
     .pipe(prefix('last 2 versions'))
-    .on('error', util.log)
+    .pipe(sourcemaps.write('maps'))
     .pipe(gulp.dest(paths.dist.css))
-    .pipe(browserSync.reload({stream: true}));
+    .pipe(reload({stream:true}))
+
+    .pipe(cleanCSS())
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(gulp.dest(paths.dist.css))
 });
 
 /* Compile Handlebars/Partials into HTML */
@@ -77,11 +104,11 @@ gulp.task('templates', () => {
 
   gulp.src([paths.src.root + '/*.hbs'])
     .pipe(handlebars(null, opts))
-    .on('error', util.log)
+    .pipe(plumber({errorHandler: onError}))
     .pipe(rename({
       extname: '.html',
     }))
-    .on('error', util.log)
+    .pipe(plumber({errorHandler: onError}))
     .pipe(gulp.dest(paths.dist.root))
     .pipe(browserSync.reload({stream: true}));
 });
@@ -93,20 +120,20 @@ gulp.task('scripts', () => {
       presets: ['es2015'],
     }))
     .pipe(concat('bundle.js'))
-    .on('error', util.log)
+    .pipe(plumber({errorHandler: onError}))
     .pipe(uglify())
-    .on('error', util.log)
+    .pipe(plumber({errorHandler: onError}))
     .pipe(gulp.dest(paths.dist.javascript))
     .pipe(browserSync.reload({stream: true}));
 
   /* Minify JS and move to distribution folder */
   gulp.src([paths.src.libs])
     .pipe(uglify())
-    .on('error', util.log)
+    .pipe(plumber({errorHandler: onError}))
     .pipe(rename({
       suffix: '.min',
     }))
-    .on('error', util.log)
+    .pipe(plumber({errorHandler: onError}))
     .pipe(gulp.dest(paths.dist.libs))
     .pipe(browserSync.reload({stream: true}));
 });
