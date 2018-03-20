@@ -75,6 +75,13 @@ gulp.task('serve', () => {
   });
 });
 
+/* Import Bootstrap */
+gulp.task('bootstrap', function() {
+  gulp.src(['node_modules/bootstrap/scss/bootstrap.scss'])
+  .pipe(sass())
+  .pipe(gulp.dest("dist/css"))
+});
+
 /* Glob SCSS Imports, generate sourcemaps, and compile CSS */
 gulp.task('styles', function() {
   gulp.src([paths.src.sass])
@@ -159,5 +166,5 @@ gulp.task('watch', () => {
 // BUILD TASKS
 // ---------------
 gulp.task('default', function(done) {
-  runSequence('watch', 'serve', 'images', 'files', 'styles', 'scripts', 'templates', done);
+  runSequence('bootstrap', 'watch', 'serve', 'images', 'files', 'styles', 'scripts', 'templates', done);
 });
