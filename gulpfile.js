@@ -5,18 +5,13 @@ var gulp          = require('gulp'),
     cleanCSS      = require('gulp-clean-css'),
     notify        = require('gulp-notify'),
     plumber       = require('gulp-plumber'),
-    minimist      = require('minimist'),
     rename        = require('gulp-rename'),
     sass          = require('gulp-sass'),
     sourcemaps    = require('gulp-sourcemaps'),
     runSequence   = require('run-sequence'),
     reload        = browserSync.reload,
-    del           = require('del'),
-    vinylPaths    = require('vinyl-paths'),
-    colors        = require('colors'),
     concat        = require('gulp-concat'),
     sassGlob      = require('gulp-sass-bulk-import'),
-    watch         = require('gulp-watch'),
     babel         = require('gulp-babel'),
     uglify        = require('gulp-uglify');
 
@@ -42,17 +37,6 @@ var paths = {
 
 // ERROR HANDLING
 // ---------------
-var displayError = function(error) {
-  var errorString = '[' + error.plugin.error.bold + ']';
-  errorString += ' ' + error.message.replace("\n",''); // Removes new line at the end
-  if(error.fileName) {
-    errorString += ' in ' + error.fileName;
-  }
-  if(error.lineNumber) {
-    errorString += ' on line ' + error.lineNumber.bold;
-  }
-  console.error(errorString);
-}
 var onError = function(err) {
   notify.onError({
     title:    "Gulp",
@@ -71,7 +55,7 @@ gulp.task('serve', () => {
     server: paths.dist.root,
     open: true,
     notify: false,
-    online: false, // Whether to listen on external
+    online: false,
   });
 });
 

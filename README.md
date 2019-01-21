@@ -3,7 +3,7 @@ Easily generate static sites with lightweight templating via Handlebars.
 
 ### Includes
  - Handlebars for lightweight templating
- -  SCSS Lint, Preprocessing, and minification (sourcemaps, autoprefixer, clean-css)
+ - SCSS Lint, Preprocessing, and minification (sourcemaps, autoprefixer, clean-css)
  - JavaScript minification and bundling
  - Static distribution folder for rapid deployment
  - Configurable Gulp tasks
