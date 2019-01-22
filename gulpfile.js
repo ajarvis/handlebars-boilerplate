@@ -1,42 +1,69 @@
-var gulp          = require('gulp'),
-    handlebars    = require('gulp-compile-handlebars'),
-    browserSync   = require('browser-sync'),
-    prefix        = require('gulp-autoprefixer'),
-    cleanCSS      = require('gulp-clean-css'),
-    notify        = require('gulp-notify'),
-    plumber       = require('gulp-plumber'),
-    rename        = require('gulp-rename'),
-    sass          = require('gulp-sass'),
-    sourcemaps    = require('gulp-sourcemaps'),
-    runSequence   = require('run-sequence'),
-    reload        = browserSync.reload,
-    concat        = require('gulp-concat'),
-    sassGlob      = require('gulp-sass-bulk-import'),
-    babel         = require('gulp-babel'),
-    uglify        = require('gulp-uglify');
+// Load plugins
+var babel         = require('gulp-babel');
+var browsersync   = require('browser-sync');
+var concat        = require('gulp-concat');
+var cleanCSS      = require('gulp-clean-css');
+var del           = require('del');
+var gulp          = require('gulp');
+var handlebars    = require('gulp-compile-handlebars');
+var htmlmin       = require('gulp-htmlmin');
+var imagemin      = require('gulp-imagemin');
+var notify        = require('gulp-notify');
+var plumber       = require('gulp-plumber');
+var prefix        = require('gulp-autoprefixer');
+var purgecss      = require('gulp-purgecss');
+var rename        = require('gulp-rename');
+var sass          = require('gulp-sass');
+var sassGlob      = require('gulp-sass-glob');
+var sourcemaps    = require('gulp-sourcemaps');
+var tildeImporter = require('node-sass-tilde-importer');
+var uglify        = require('gulp-uglify');
 
-var paths = {
-  src: { root: 'src' },
-  dist: { root: 'dist' },
-  init: function() {
-    this.src.sass        = this.src.root + '/scss/main.scss';
-    this.src.templates   = this.src.root + '/**/*.hbs';
-    this.src.javascript  = [this.src.root + '/js/**/*.js', '!' + this.src.root + '/js/libs/*.js'];
-    this.src.libs        = this.src.root + '/js/libs/*.js';
-    this.src.images      = this.src.root + '/images/**/*.{jpg,jpeg,svg,png,gif}';
-    this.src.files       = this.src.root + '/*.{html,txt}';
 
-    this.dist.css        = this.dist.root + '/css';
-    this.dist.images     = this.dist.root + '/images';
-    this.dist.javascript = this.dist.root + '/js';
-    this.dist.libs       = this.dist.root + '/js/libs';
-
-    return this;
+// Define Paths
+const paths = {
+  src: {
+    root: 'src',
+    sass: 'src/scss/main.scss',
+    templates: 'src/**/*.hbs',
+    partials: 'src/partials',
+    javascript: 'src/js/**/*.js',
+    libs: 'src/js/libs/*.js',
+    images: 'src/images/**/*.{jpg,jpeg,svg,png,gif}',
+    files: 'src/*.{html,txt}'
   },
-}.init();
+  dist: {
+    root: 'dist',
+    css: 'dist/css',
+    images: 'dist/images',
+    javascript: 'dist/js',
+    libs: 'dist/libs'
+  }
+};
 
-// ERROR HANDLING
-// ---------------
+// var paths = {
+//   src: { root: 'src' },
+//   dist: { root: 'dist' },
+//   init: function() {
+//     this.src.sass        = this.src.root + '/scss/main.scss';
+//     this.src.templates   = this.src.root + '/**/*.hbs';
+//     this.src.javascript  = [this.src.root + '/js/**/*.js', '!' + this.src.root + '/js/libs/*.js'];
+//     this.src.libs        = this.src.root + '/js/libs/*.js';
+//     this.src.images      = this.src.root + '/images/**/*.{jpg,jpeg,svg,png,gif}';
+//     this.src.files       = this.src.root + '/*.{html,txt}';
+
+//     this.dist            = this.dist.root;
+//     this.dist.css        = this.dist.root + '/css';
+//     this.dist.images     = this.dist.root + '/images';
+//     this.dist.javascript = this.dist.root + '/js';
+//     this.dist.libs       = this.dist.root + '/js/libs';
+
+//     return this;
+//   },
+// }.init();
+
+
+// Error Messaging
 var onError = function(err) {
   notify.onError({
     title:    "Gulp",
@@ -48,77 +75,106 @@ var onError = function(err) {
 };
 
 
-// BUILD ALL SUBTASKS
-// ---------------
-gulp.task('serve', () => {
-  browserSync.init({
-    server: paths.dist.root,
-    open: true,
-    notify: false,
-    online: false,
+// Clean Dist
+function cleanDist() {
+  return del(paths.dist.root);
+}
+
+
+// Start Server
+function runBrowsersync(done) {
+  browsersync.init({
+    server: {
+      baseDir: paths.dist.root
+    },
+    port: 3000,
+    notify: true
   });
-});
+  done();
+}
 
-/* Import Bootstrap */
-gulp.task('bootstrap', function() {
-  gulp.src(['node_modules/bootstrap/scss/bootstrap.scss'])
-  .pipe(sass())
-  .pipe(gulp.dest("dist/css"))
-});
 
-/* Glob SCSS Imports, generate sourcemaps, and compile CSS */
-gulp.task('styles', function() {
-  gulp.src([paths.src.sass])
-    .pipe(sassGlob())
-    .pipe(plumber({errorHandler: onError}))
-    .pipe(sourcemaps.init())
-    .pipe(sass({
-      includePaths: ['src/scss'],
-      outputStyle: 'expanded'
-    }))
-    .pipe(prefix('last 2 versions'))
-    .pipe(sourcemaps.write('maps'))
+// Import Bootstrap
+// TODO: JavaScript Copy Task
+function bootstrap(done) {
+  gulp
+    .src(['node_modules/bootstrap/scss/bootstrap.scss'])
+    .pipe(sass())
     .pipe(gulp.dest(paths.dist.css))
-    .pipe(reload({stream:true}))
+  done();
+}
 
-    .pipe(cleanCSS())
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(gulp.dest(paths.dist.css))
-});
 
-/* Compile Handlebars/Partials into HTML */
-gulp.task('templates', () => {
+// Compile Handlebars into HTML
+function html(done) {
   var opts = {
     ignorePartials: true,
-    batch: ['src/partials'],
+    batch: [paths.src.partials],
   };
 
-  gulp.src([paths.src.root + '/*.hbs'])
+  gulp
+    .src([paths.src.root + '/*.hbs'])
     .pipe(handlebars(null, opts))
     .pipe(plumber({errorHandler: onError}))
     .pipe(rename({
       extname: '.html',
     }))
     .pipe(plumber({errorHandler: onError}))
+    .pipe(htmlmin({ collapseWhitespace: true }))
     .pipe(gulp.dest(paths.dist.root))
-    .pipe(browserSync.reload({stream: true}));
-});
+    .pipe(browsersync.stream());
+  done();
+}
 
-/* Bundle all javascript */
-gulp.task('scripts', () => {
-  gulp.src(paths.src.javascript)
+
+// Glob SCSS Imports, Generate Sourcemaps, and Compile to CSS
+var sassOptions = {
+  outputStyle: 'expanded',
+  importer: tildeImporter
+};
+var prefixerOptions = {
+  browsers: ['last 2 versions']
+};
+
+function styles(done) {
+  gulp
+    .src([paths.src.sass])
+    .pipe(sassGlob())
+    .pipe(plumber({ errorHandler: onError }))
+    .pipe(purgecss({
+      content: [paths.src.root + "/*.hbs", paths.src.root + "/**/*.hbs"]
+    }))
+    .pipe(sourcemaps.init())
+    .pipe(sass(sassOptions))
+    .pipe(prefix(prefixerOptions))
+    .pipe(cleanCSS({ compatibility: '*' }))
+    .pipe(sourcemaps.write('maps'))
+    .pipe(gulp.dest(paths.dist.css))
+    .pipe(browsersync.stream())
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(gulp.dest(paths.dist.css))
+    .pipe(browsersync.stream());
+  done();
+}
+
+
+// Bundle and Minify JS
+function scripts(done) {
+
+  gulp
+    .src(paths.src.javascript)
     .pipe(babel({
-      presets: ['es2015'],
+      presets: ['@babel/env'],
     }))
     .pipe(concat('bundle.js'))
     .pipe(plumber({errorHandler: onError}))
     .pipe(uglify())
     .pipe(plumber({errorHandler: onError}))
     .pipe(gulp.dest(paths.dist.javascript))
-    .pipe(browserSync.reload({stream: true}));
+    .pipe(browsersync.stream());
 
-  /* Minify JS and move to distribution folder */
-  gulp.src([paths.src.libs])
+  gulp
+    .src([paths.src.libs])
     .pipe(uglify())
     .pipe(plumber({errorHandler: onError}))
     .pipe(rename({
@@ -126,29 +182,45 @@ gulp.task('scripts', () => {
     }))
     .pipe(plumber({errorHandler: onError}))
     .pipe(gulp.dest(paths.dist.libs))
-    .pipe(browserSync.reload({stream: true}));
-});
+    .pipe(browsersync.stream());
 
-/* Copy images to dist folder */
-gulp.task('images', () => {
-  gulp.src([paths.src.images])
-    .pipe(gulp.dest(paths.dist.images));
-});
+  done();
+}
 
-/* Copy files to dist folder */
-gulp.task('files', () => {
-  gulp.src([paths.src.files])
+
+// Copy Images to Dist
+function images(done) {
+  gulp
+    .src([paths.src.images])
+    .pipe(imagemin({
+      interlaced: true,
+      progressive: true,
+      optimizationLevel: 5
+    }))
+    .pipe(gulp.dest(paths.dist.images))
+    .pipe(browsersync.stream());
+  done();
+}
+
+
+// Copy Files to Dist
+function files(done) {
+  gulp
+    .src([paths.src.files])
     .pipe(gulp.dest(paths.dist.root));
-});
+  done();
+}
 
-gulp.task('watch', () => {
-  gulp.watch('src/scss/**/*.scss', ['styles']);
-  gulp.watch(paths.src.javascript, ['scripts']);
-  gulp.watch(paths.src.templates, ['templates']);
-});
 
-// BUILD TASKS
-// ---------------
-gulp.task('default', function(done) {
-  runSequence('bootstrap', 'watch', 'serve', 'images', 'files', 'styles', 'scripts', 'templates', done);
-});
+// Watch Folders
+function watchFiles() {
+  gulp.watch(paths.src.sass, gulp.parallel(styles, html));
+  gulp.watch(paths.src.javascript, scripts);
+  gulp.watch(paths.src.templates, gulp.parallel(styles, html));
+}
+
+
+// Build Tasks
+gulp.task('default', gulp.series(cleanDist, html, scripts, images, files, bootstrap, styles, gulp.parallel(watchFiles, runBrowsersync), function (done) {
+  done();
+}));

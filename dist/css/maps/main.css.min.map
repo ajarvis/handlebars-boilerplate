@@ -1,0 +1,1 @@
+{"version":3,"sources":["main.scss"],"names":[],"mappings":"AAKA,KACE,WAAA","file":"../main.css","sourcesContent":["@import \"base/base\";\n@import \"components/footer.scss\";\n@import \"components/header.scss\";\n\n\nbody {\n  background: red;\n}"]}
