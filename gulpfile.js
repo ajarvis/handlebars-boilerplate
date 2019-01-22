@@ -41,27 +41,6 @@ const paths = {
   }
 };
 
-// var paths = {
-//   src: { root: 'src' },
-//   dist: { root: 'dist' },
-//   init: function() {
-//     this.src.sass        = this.src.root + '/scss/main.scss';
-//     this.src.templates   = this.src.root + '/**/*.hbs';
-//     this.src.javascript  = [this.src.root + '/js/**/*.js', '!' + this.src.root + '/js/libs/*.js'];
-//     this.src.libs        = this.src.root + '/js/libs/*.js';
-//     this.src.images      = this.src.root + '/images/**/*.{jpg,jpeg,svg,png,gif}';
-//     this.src.files       = this.src.root + '/*.{html,txt}';
-
-//     this.dist            = this.dist.root;
-//     this.dist.css        = this.dist.root + '/css';
-//     this.dist.images     = this.dist.root + '/images';
-//     this.dist.javascript = this.dist.root + '/js';
-//     this.dist.libs       = this.dist.root + '/js/libs';
-
-//     return this;
-//   },
-// }.init();
-
 
 // Error Messaging
 var onError = function(err) {
