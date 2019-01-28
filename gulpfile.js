@@ -80,18 +80,22 @@ function bootstrap(done) {
     .src(['node_modules/bootstrap/scss/bootstrap.scss'])
     .pipe(sass())
     .pipe(gulp.dest(paths.dist.css))
+
+  gulp
+    .src(['node_modules/bootstrap/dist/js/bootstrap.js'])
+    .pipe(gulp.dest("src/js"))
   done();
 }
 
 
 // Compile Handlebars into HTML
-function html(done) {
+function html() {
   var opts = {
     ignorePartials: true,
     batch: [paths.src.partials],
   };
 
-  gulp
+ return gulp
     .src([paths.src.root + '/*.hbs'])
     .pipe(handlebars(null, opts))
     .pipe(plumber({errorHandler: onError}))
@@ -102,7 +106,6 @@ function html(done) {
     .pipe(htmlmin({ collapseWhitespace: true }))
     .pipe(gulp.dest(paths.dist.root))
     .pipe(browsersync.stream());
-  done();
 }
 
 
@@ -193,9 +196,9 @@ function files(done) {
 
 // Watch Folders
 function watchFiles() {
-  gulp.watch(paths.src.sass, gulp.parallel(styles, html));
+  gulp.watch(paths.src.sass, styles);
   gulp.watch(paths.src.javascript, scripts);
-  gulp.watch(paths.src.templates, gulp.parallel(styles, html));
+  gulp.watch(paths.src.templates, gulp.parallel(html, styles));
 }
 
 
