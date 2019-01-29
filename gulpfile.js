@@ -33,11 +33,11 @@ const paths = {
     files: 'src/*.{html,txt}'
   },
   dist: {
-    root: 'dist',
-    css: 'dist/css',
-    images: 'dist/images',
-    javascript: 'dist/js',
-    libs: 'dist/libs'
+    root: 'docs',
+    css: 'docs/css',
+    images: 'docs/images',
+    javascript: 'docs/js',
+    libs: 'docs/libs'
   }
 };
 
