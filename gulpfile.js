@@ -28,7 +28,7 @@ const paths = {
     templates: 'src/**/*.hbs',
     partials: 'src/partials',
     javascript: 'src/js/**/*.js',
-    libs: 'src/js/libs/*.js',
+    libs: 'src/libs/**/*',
     images: 'src/images/**/*.{jpg,jpeg,svg,png,gif}',
     files: 'src/*.{html,txt}'
   },
@@ -73,17 +73,33 @@ function runBrowsersync(done) {
 }
 
 
-// Import Bootstrap
-// TODO: JavaScript Copy Task
-function bootstrap(done) {
+// Import Libraries
+function importLibraries(done) {
   gulp
     .src(['node_modules/bootstrap/scss/bootstrap.scss'])
     .pipe(sass())
     .pipe(gulp.dest(paths.dist.css))
-
+    
   gulp
-    .src(['node_modules/bootstrap/dist/js/bootstrap.js'])
-    .pipe(gulp.dest("src/js"))
+    .src([
+      'node_modules/bootstrap/dist/js/bootstrap.js',
+      'node_modules/jquery/dist/jquery.js',
+      'node_modules/popper.js/dist/popper.js',
+    ])
+    .pipe(babel({
+      presets: ['@babel/env'],
+    }))
+    .pipe(concat('libraries.js'))
+    .pipe(plumber({errorHandler: onError}))
+    .pipe(gulp.dest(paths.dist.javascript))
+    .pipe(uglify())
+    .pipe(plumber({errorHandler: onError}))
+    .pipe(rename({
+      suffix: '.min',
+    }))
+    .pipe(gulp.dest(paths.dist.javascript))
+    .pipe(plumber({errorHandler: onError}))
+
   done();
 }
 
@@ -150,6 +166,10 @@ function scripts(done) {
     }))
     .pipe(concat('bundle.js'))
     .pipe(plumber({errorHandler: onError}))
+    .pipe(gulp.dest(paths.dist.javascript))
+    .pipe(rename({
+      suffix: '.min',
+    }))
     .pipe(uglify())
     .pipe(plumber({errorHandler: onError}))
     .pipe(gulp.dest(paths.dist.javascript))
@@ -203,6 +223,6 @@ function watchFiles() {
 
 
 // Build Tasks
-gulp.task('default', gulp.series(cleanDist, html, scripts, images, files, bootstrap, styles, gulp.parallel(watchFiles, runBrowsersync), function (done) {
+gulp.task('default', gulp.series(cleanDist, importLibraries, html, scripts, images, files, styles, gulp.parallel(watchFiles, runBrowsersync), function (done) {
   done();
 }));
