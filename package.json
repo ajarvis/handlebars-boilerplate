@@ -32,8 +32,14 @@
     "gulp-sass-glob": "^1.0.9",
     "gulp-series": "^1.0.2",
     "gulp-sourcemaps": "^2.6.4",
+    "gulp-stylelint": "^8.0.0",
     "gulp-uglify": "^3.0.1",
-    "node-sass-tilde-importer": "^1.0.2"
+    "node-sass-tilde-importer": "^1.0.2",
+    "stylelint": "^9.9.0",
+    "stylelint-config-standard": "^18.2.0",
+    "stylelint-config-standard-scss": "^1.0.1",
+    "stylelint-declaration-use-variable": "^1.6.0",
+    "stylelint-scss": "^3.4.4"
   },
   "dependencies": {
     "bootstrap": "^4.2.1",

@@ -17,6 +17,7 @@ var rename          = require('gulp-rename');
 var sass            = require('gulp-sass');
 var sassGlob        = require('gulp-sass-glob');
 var sourcemaps      = require('gulp-sourcemaps');
+var stylelint       = require('gulp-stylelint');
 var tildeImporter   = require('node-sass-tilde-importer');
 var uglify          = require('gulp-uglify');
 
@@ -155,6 +156,19 @@ function styles() {
     .pipe(browsersync.stream());
 }
 
+function runStylelint() {
+  return gulp
+    .src([paths.src.sass+'**/*.scss'])
+    .pipe(stylelint({
+      failAfterError: false,
+      reportOutputDir: 'reports/lint',
+      reporters: [
+        {formatter: 'verbose', console: true}
+      ],
+      debug: true
+    }))
+}
+
 
 // Bundle and Minify JS
 function scripts(done) {
@@ -216,7 +230,7 @@ function files(done) {
 
 // Watch Folders
 function watchFiles() {
-  gulp.watch(paths.src.sass, styles);
+  gulp.watch(paths.src.sass, gulp.series(styles, runStylelint));
   gulp.watch(paths.src.javascript, scripts);
   gulp.watch(paths.src.images, images);
   gulp.watch(paths.src.hbs, gulp.parallel(html, styles));
@@ -224,6 +238,6 @@ function watchFiles() {
 
 
 // Build Tasks
-gulp.task('default', gulp.series(cleanDist, importLibraries, html, scripts, images, files, styles, gulp.parallel(watchFiles, runBrowsersync), function (done) {
+gulp.task('default', gulp.series(cleanDist, runStylelint, importLibraries, html, scripts, images, files, styles, gulp.parallel(watchFiles, runBrowsersync), function (done) {
   done();
 }));
