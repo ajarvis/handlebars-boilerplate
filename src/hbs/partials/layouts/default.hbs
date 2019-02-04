@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{{pageTitle}}</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <link rel="stylesheet" href="css/bootstrap.css" type="text/css">
+  <link rel="stylesheet" href="css/main.min.css" type="text/css">
+
+  {{#> head-block}}
+  {{!-- additional head content inserted inline from pages --}}
+  {{/head-block}}
+</head>
+
+<body>
+
+  {{#> header-block}}
+  {{> includes/header }}
+  {{/header-block}}
+
+
+  {{#> content-block}}
+  {{!-- page content inserted inline from pages --}}
+  {{/content-block}}
+
+  </main>
+
+  <script src="js/libraries.min.js"></script>
+  <script src="js/bundle.min.js"></script>
+
+  {{#> scripts-block}}
+  {{!-- additional scripts inserted inline from pages --}}
+  {{/scripts-block}}
+
+</body>
+</html>

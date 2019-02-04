@@ -1,32 +1,35 @@
 // Load plugins
-var babel         = require('gulp-babel');
-var browsersync   = require('browser-sync');
-var concat        = require('gulp-concat');
-var cleanCSS      = require('gulp-clean-css');
-var del           = require('del');
-var gulp          = require('gulp');
-var handlebars    = require('gulp-compile-handlebars');
-var htmlmin       = require('gulp-htmlmin');
-var imagemin      = require('gulp-imagemin');
-var notify        = require('gulp-notify');
-var plumber       = require('gulp-plumber');
-var prefix        = require('gulp-autoprefixer');
-var purgecss      = require('gulp-purgecss');
-var rename        = require('gulp-rename');
-var sass          = require('gulp-sass');
-var sassGlob      = require('gulp-sass-glob');
-var sourcemaps    = require('gulp-sourcemaps');
-var tildeImporter = require('node-sass-tilde-importer');
-var uglify        = require('gulp-uglify');
+var babel           = require('gulp-babel');
+var browsersync     = require('browser-sync');
+var concat          = require('gulp-concat');
+var cleanCSS        = require('gulp-clean-css');
+var del             = require('del');
+var gulp            = require('gulp');
+var handlebars      = require('gulp-compile-handlebars');
+var handlebarsData  = require("./src/hbs/data/data.json");
+var htmlmin         = require('gulp-htmlmin');
+var imagemin        = require('gulp-imagemin');
+var notify          = require('gulp-notify');
+var plumber         = require('gulp-plumber');
+var prefix          = require('gulp-autoprefixer');
+var purgecss        = require('gulp-purgecss');
+var rename          = require('gulp-rename');
+var sass            = require('gulp-sass');
+var sassGlob        = require('gulp-sass-glob');
+var sourcemaps      = require('gulp-sourcemaps');
+var tildeImporter   = require('node-sass-tilde-importer');
+var uglify          = require('gulp-uglify');
 
 
 // Define Paths
 const paths = {
   src: {
     root: 'src',
-    sass: 'src/scss/main.scss',
-    templates: 'src/**/*.hbs',
-    partials: 'src/partials',
+    hbs: 'src/hbs/**/*.hbs',
+    pages: 'src/hbs/*.hbs',
+    partials: 'src/hbs/partials/',
+    sass: 'src/scss/',
+
     javascript: 'src/js/**/*.js',
     libs: 'src/libs/**/*',
     images: 'src/images/**/*.{jpg,jpeg,svg,png,gif}',
@@ -106,23 +109,21 @@ function importLibraries(done) {
 
 // Compile Handlebars into HTML
 function html() {
-  var opts = {
-    ignorePartials: true,
-    batch: [paths.src.partials],
-  };
-
- return gulp
-    .src([paths.src.root + '/*.hbs'])
-    .pipe(handlebars(null, opts))
+  return gulp
+    .src(paths.src.pages)
+    .pipe(handlebars(handlebarsData, {
+      ignorePartials: true,
+      batch: [paths.src.partials]
+    }))
     .pipe(plumber({errorHandler: onError}))
     .pipe(rename({
-      extname: '.html',
+      extname: '.html'
     }))
     .pipe(plumber({errorHandler: onError}))
     .pipe(htmlmin({ collapseWhitespace: true }))
     .pipe(gulp.dest(paths.dist.root))
-    .pipe(browsersync.stream());
-}
+    .pipe(browsersync.reload({ stream:true }));
+};
 
 
 // Glob SCSS Imports, Generate Sourcemaps, and Compile to CSS
@@ -134,13 +135,13 @@ var prefixerOptions = {
   browsers: ['last 2 versions']
 };
 
-function styles(done) {
-  gulp
-    .src([paths.src.sass])
+function styles() {
+  return gulp
+    .src([paths.src.sass+'main.scss'])
     .pipe(sassGlob())
     .pipe(plumber({ errorHandler: onError }))
     .pipe(purgecss({
-      content: [paths.src.root + "/*.hbs", paths.src.root + "/**/*.hbs"]
+      content: [paths.src.root + "/hbs/**/*.hbs"]
     }))
     .pipe(sourcemaps.init())
     .pipe(sass(sassOptions))
@@ -152,7 +153,6 @@ function styles(done) {
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest(paths.dist.css))
     .pipe(browsersync.stream());
-  done();
 }
 
 
@@ -179,6 +179,7 @@ function scripts(done) {
     .src([paths.src.libs])
     .pipe(uglify())
     .pipe(plumber({errorHandler: onError}))
+    .pipe(concat('bundle.js'))
     .pipe(rename({
       suffix: '.min',
     }))
@@ -191,8 +192,8 @@ function scripts(done) {
 
 
 // Copy Images to Dist
-function images(done) {
-  gulp
+function images() {
+  return gulp
     .src([paths.src.images])
     .pipe(imagemin({
       interlaced: true,
@@ -201,7 +202,6 @@ function images(done) {
     }))
     .pipe(gulp.dest(paths.dist.images))
     .pipe(browsersync.stream());
-  done();
 }
 
 
@@ -218,7 +218,8 @@ function files(done) {
 function watchFiles() {
   gulp.watch(paths.src.sass, styles);
   gulp.watch(paths.src.javascript, scripts);
-  gulp.watch(paths.src.templates, gulp.parallel(html, styles));
+  gulp.watch(paths.src.images, images);
+  gulp.watch(paths.src.hbs, gulp.parallel(html, styles));
 }
 
 
