@@ -1,6 +1,9 @@
 # Handlebars Boilerplate
 Easily generate static sites with lightweight templating via Handlebars.
 
+![Image of Lighthouse Score](https://ajarvis.github.io/handlebars-boilerplate/images/lighthouse-score.png)
+
+
 ### Includes
  - Handlebars for lightweight templating
  - SCSS Lint, Preprocessing, and minification (sourcemaps, autoprefixer, clean-css)
