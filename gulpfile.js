@@ -80,15 +80,14 @@ function runBrowsersync(done) {
 // Import Libraries
 function importLibraries(done) {
   gulp
-    .src(['node_modules/bootstrap/scss/bootstrap.scss'])
-    .pipe(sass())
-    .pipe(gulp.dest(paths.dist.css))
+    .src([
+      'node_modules/bulma/sass/**/*'
+    ])
+    .pipe(gulp.dest(paths.src.sass+"bulma"))
     
   gulp
     .src([
-      'node_modules/bootstrap/dist/js/bootstrap.js',
-      'node_modules/jquery/dist/jquery.js',
-      'node_modules/popper.js/dist/popper.js',
+      'node_modules/jquery/dist/jquery.js'
     ])
     .pipe(babel({
       presets: ['@babel/env'],
