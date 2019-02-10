@@ -1,8 +1,12 @@
 # Handlebars Boilerplate
 Easily generate static sites with lightweight templating via Handlebars.
 
-![Image of Lighthouse Score](https://ajarvis.github.io/handlebars-boilerplate/images/lighthouse-score.png)
+[![CodeFactor](https://www.codefactor.io/repository/github/ajarvis/handlebars-boilerplate/badge)](https://www.codefactor.io/repository/github/ajarvis/handlebars-boilerplate)
+[![dependencies Status](https://david-dm.org/ajarvis/handlebars-boilerplate/status.svg)](https://david-dm.org/ajarvis/handlebars-boilerplate)
+[![devDependencies Status](https://david-dm.org/ajarvis/handlebars-boilerplate/dev-status.svg)](https://david-dm.org/ajarvis/handlebars-boilerplate?type=dev)
 
+### Lighthouse Audit
+![Image of Lighthouse Score](https://ajarvis.github.io/handlebars-boilerplate/images/lighthouse-score.png)
 
 ### Includes
  - Handlebars for lightweight templating
