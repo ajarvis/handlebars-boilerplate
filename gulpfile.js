@@ -84,24 +84,6 @@ function importLibraries(done) {
       'node_modules/bulma/sass/**/*'
     ])
     .pipe(gulp.dest(paths.src.sass+"bulma"))
-    
-  // gulp
-  //   .src([
-  //     'node_modules/jquery/dist/jquery.js'
-  //   ])
-  //   .pipe(babel({
-  //     presets: ['@babel/env'],
-  //   }))
-  //   .pipe(concat('libraries.js'))
-  //   .pipe(plumber({errorHandler: onError}))
-  //   .pipe(gulp.dest(paths.dist.javascript))
-  //   .pipe(uglify())
-  //   .pipe(plumber({errorHandler: onError}))
-  //   .pipe(rename({
-  //     suffix: '.min',
-  //   }))
-  //   .pipe(gulp.dest(paths.dist.javascript))
-  //   .pipe(plumber({errorHandler: onError}))
 
   done();
 }
@@ -123,7 +105,7 @@ function html() {
     .pipe(htmlmin({ collapseWhitespace: true }))
     .pipe(gulp.dest(paths.dist.root))
     .pipe(browsersync.reload({ stream:true }));
-};
+}
 
 
 // Glob SCSS Imports, Generate Sourcemaps, and Compile to CSS
