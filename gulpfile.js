@@ -1,34 +1,35 @@
 // Load plugins
-var babel           = require('gulp-babel');
-var browsersync     = require('browser-sync');
-var concat          = require('gulp-concat');
-var cleanCSS        = require('gulp-clean-css');
-var del             = require('del');
-var gulp            = require('gulp');
-var handlebars      = require('gulp-compile-handlebars');
-var handlebarsData  = require("./src/hbs/data/data.json");
-var htmlmin         = require('gulp-htmlmin');
-var imagemin        = require('gulp-imagemin');
-var notify          = require('gulp-notify');
-var plumber         = require('gulp-plumber');
-var prefix          = require('gulp-autoprefixer');
-var purgecss        = require('gulp-purgecss');
-var rename          = require('gulp-rename');
-var sass            = require('gulp-sass');
-var sassGlob        = require('gulp-sass-glob');
-var sourcemaps      = require('gulp-sourcemaps');
-var stylelint       = require('gulp-stylelint');
-var tildeImporter   = require('node-sass-tilde-importer');
-var uglify          = require('gulp-uglify');
+const babel           = require('gulp-babel');
+const browsersync     = require('browser-sync');
+const concat          = require('gulp-concat');
+const cleanCSS        = require('gulp-clean-css');
+const del             = require('del');
+const gulp            = require('gulp');
+const hb              = require('gulp-hb');
+const htmlmin         = require('gulp-htmlmin');
+const imagemin        = require('gulp-imagemin');
+const notify          = require('gulp-notify');
+const plumber         = require('gulp-plumber');
+const prefix          = require('gulp-autoprefixer');
+const purgecss        = require('gulp-purgecss');
+const rename          = require('gulp-rename');
+const sass            = require('gulp-sass');
+const sassGlob        = require('gulp-sass-glob');
+const sourcemaps      = require('gulp-sourcemaps');
+const stylelint       = require('gulp-stylelint');
+const tildeImporter   = require('node-sass-tilde-importer');
+const uglify          = require('gulp-uglify');
 
 
 // Define Paths
 const paths = {
   src: {
     root: 'src',
+    data: 'src/hbs/data/',
     hbs: 'src/hbs/**/*.hbs',
-    pages: 'src/hbs/*.hbs',
+    pages: 'src/hbs/pages/',
     partials: 'src/hbs/partials/',
+    helpers: 'src/hbs/helpers/',
     sass: 'src/scss/',
 
     javascript: 'src/js/**/*.js',
@@ -92,19 +93,17 @@ function importLibraries(done) {
 // Compile Handlebars into HTML
 function html() {
   return gulp
-    .src(paths.src.pages)
-    .pipe(handlebars(handlebarsData, {
-      ignorePartials: true,
-      batch: [paths.src.partials]
-    }))
-    .pipe(plumber({errorHandler: onError}))
+    .src(paths.src.pages+'**/*.hbs')
+    .pipe(hb({ debug: true })
+      .partials(paths.src.partials+'**/*.{hbs,js}')
+      .helpers(paths.src.helpers+'**/*.js')
+      .data(paths.src.data+'**/*.{js,json}')
+    )
     .pipe(rename({
       extname: '.html'
     }))
-    .pipe(plumber({errorHandler: onError}))
-    .pipe(htmlmin({ collapseWhitespace: true }))
     .pipe(gulp.dest(paths.dist.root))
-    .pipe(browsersync.reload({ stream:true }));
+    .pipe(browsersync.stream());
 }
 
 
