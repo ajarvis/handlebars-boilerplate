@@ -1,7 +1,7 @@
 {
   "name": "handlebars-boilerplate",
   "version": "1.0.0",
-  "description": "A starter kit for static websites.",
+  "description": "A starter kit for rapidly creating static websites.",
   "author": "Adam Jarvis <adam@adamcjarvis.com>",
   "license": "ISC",
   "repository": {
@@ -12,37 +12,40 @@
     "start": "gulp"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/preset-env": "^7.4.5",
-    "browser-sync": "^2.26.5",
-    "del": "^4.1.1",
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "browser-sync": "^2.26.7",
+    "del": "^5.1.0",
     "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^6.1.0",
+    "gulp-autoprefixer": "^7.0.1",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.2.0",
     "gulp-concat": "^2.6.1",
     "gulp-hb": "^8.0.0",
     "gulp-htmlmin": "^5.0.1",
-    "gulp-imagemin": "^6.0.0",
+    "gulp-imagemin": "^6.2.0",
     "gulp-notify": "^3.2.0",
     "gulp-plumber": "^1.2.1",
-    "gulp-purgecss": "^1.1.1",
-    "gulp-rename": "^1.4.0",
+    "gulp-purgecss": "^1.2.0",
+    "gulp-rename": "^2.0.0",
     "gulp-sass": "^4.0.2",
-    "gulp-sass-glob": "^1.0.9",
+    "gulp-sass-glob": "^1.1.0",
     "gulp-series": "^1.0.2",
-    "gulp-sourcemaps": "^2.6.4",
-    "gulp-stylelint": "^9.0.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-stylelint": "^11.0.0",
     "gulp-uglify": "^3.0.2",
     "node-sass-tilde-importer": "^1.0.2",
-    "stylelint": "^10.0.1",
-    "stylelint-config-standard": "^18.3.0",
+    "stylelint": "^12.0.1",
+    "stylelint-config-standard": "^19.0.0",
     "stylelint-config-standard-scss": "^1.1.0",
-    "stylelint-declaration-use-variable": "^1.7.0",
-    "stylelint-scss": "^3.8.0"
+    "stylelint-declaration-use-variable": "^1.7.2",
+    "stylelint-scss": "^3.13.0"
   },
   "dependencies": {
-    "bulma": "^0.7.5",
+    "bulma": "^0.8.0",
     "jquery": "^3.4.1"
-  }
+  },
+  "browserslist": [
+    "last 2 versions"
+  ]
 }

@@ -112,9 +112,6 @@ var sassOptions = {
   outputStyle: 'expanded',
   importer: tildeImporter
 };
-var prefixerOptions = {
-  browsers: ['last 2 versions']
-};
 
 function styles() {
   return gulp
@@ -127,7 +124,7 @@ function styles() {
     .pipe(plumber({ errorHandler: onError }))
     .pipe(sourcemaps.init())
     .pipe(sass(sassOptions))
-    .pipe(prefix(prefixerOptions))
+    .pipe(prefix())
     .pipe(cleanCSS({ compatibility: '*' }))
     .pipe(sourcemaps.write('maps'))
     .pipe(gulp.dest(paths.dist.css))
